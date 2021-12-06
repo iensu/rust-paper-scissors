@@ -1,0 +1,411 @@
+#+title: Rust, Paper, Scissors
+#+author: Jens Östlund
+#+email: jens.ostlund@futurice.com
+#+language: en
+#+options: toc:nil
+#+options: num:2
+#+export_file_name: docs/index.html
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="style-overrides.css" />
+
+/This text is an outline for a hands-on Rust workshop for beginners held at [[https://futurice.com/][Futurice]]. The content is geared towards developers with a background in more dynamic languages such as JavaScript or Python but who has no prior experience coding in Rust./
+
+Let's learn a bit of Rust through a game of ✊✋✌️! We will be implementing a CLI app for playing rock, paper, scissors.
+
+A quick reminder of the rules of the game:
+
+- Each player selects either rock, paper or scissors
+- Players reveal their pick at the same time
+- The winner is decided according to the following rules:
+  - Rock beats scissors
+  - Scissors beat paper
+  - Paper beats rock
+
+Usually the game is played best of three rounds and can include multiple people. For the sake of time we will only consider a two player game (human vs. computer) of 1 round.
+
+By following the instructions and tackling the exercises below you will should get a feel for the Rust workflow and the language itself.
+
+To follow along you will need to have ~cargo~, the build tool, and ~rustc,~ the Rust compiler, installed. I've used ~rustc~ version 1.57.0 when writing article. I recommend using using [[https://rustup.rs/][rustup]] if you need to install them.
+
+There is [[https://github.com/iensu/janken/][a reference repository]] which follows the article. If you get stuck at one of the exercises you can have a look at the commit history of the project to get inspiration on how to move forward.
+
+As the article progresses more assumptions will be made about the code you have written. For instance, I make the assumption that you will write code that follows idiomatic JavaScript or Python patterns and will introduce rustier ways of doing things as we go along. The reason being that I want you to solve the exercise yourself first and keep blind code copying to a minimum. If your solution starts to diverge and you end up at a place where my instructions do not make sense, most likely you've thought ahead so move on to the next step.
+
+* Humble beginnings
+We need to create a project for our app, but before that we need a name. Let's call it /janken/ (じゃん拳), the Japanese name for the game. You can create your project using ~cargo~:
+
+#+begin_src shell
+  $ cargo new janken
+#+end_src
+
+This will create a project with a very simple Rust application (binary) with only one source file: =./src/main.rs= and a =Cargo.toml= project manifest file. Git has also already been setup for you.
+
+You can run your application like so:
+
+#+begin_src shell
+  $ cargo run
+#+end_src
+
+That command will compile your application and run it. The actual application binary has been written to =./target/debug/janken=. Now try this:
+
+#+begin_src shell
+  $ ./target/debug/janken
+#+end_src
+
+Rust compiles your application down to machine code so you can execute the binary directly; there is no need for an external program to execute it like for example with Node.js or Python.
+
+We need to be able to decide who the winner is so let's create a function that takes two hand shapes and returns ~true~ if the first argument is the winner, ~false~ otherwise. Since we're still a bit away from being able to test the logic ourselves, let's start with writing some tests.
+
+** Writing tests
+In Rust we usually tests write tests in a private module in the same file (*module*) as the implementation.
+
+#+begin_src rust
+
+  // This annotation makes sure the `tests` module is
+  // only compiled when running tests.
+  #[cfg(test)]
+  mod tests {
+      // We import everything in our parent module.
+      use super::*;
+
+      // This annotation tells the test runner that the
+      // function should be run as a test.
+      #[test]
+      fn is_meaning_of_life() {
+          let meaning_of_life = 42;
+
+          // Make the assertion.
+          // It is customary to put the expected result on
+          // the left and the calculated value on the right.
+          assert_eq!(42, meaning_of_life);
+      }
+  }
+#+end_src
+
+*EXERCISE 1:* Add a test called ~rock-wins-over-scissors~ that calls a function called ~is_winner~ with the arguments ~"rock"~ and ~"scissors"~ and expect the result to be ~true~.
+
+** Partial implementations
+Now when you try to run the tests the code will not compile since the ~is_winner~ function has not yet been defined. Often you will want to try things out before you've figured out all the details of your implementation and made the code compile. Rust has a neat feature for this: the ~todo!()~ macro. The ~todo!()~ macro will allow your code to compile without you having finished the implementation.
+
+#+begin_src rust
+  fn is_winner(p1: &str, p2: &str) -> bool {
+      todo!()
+  }
+#+end_src
+
+Now we are able to run the test, but it fails with the message /not yet implemented/.
+
+*EXERCISE 2:* Make the test pass.
+
+*EXERCISE 3:* Follow the same procedure and implement the remaining two cases.
+
+* Rustifying the code
+There are multiple issues with our ~is_winner~ function, for one it does not handle draws yet (we will address that later).
+
+Another issue is that the current implementation does not properly codify the domain: we are just matching on plain strings everywhere. Since we know we can only have three different hand shape values, we should express that in the code. In Rust this is done with an ~enum~. You can [[https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html?highlight=enum#the-option-enum-and-its-advantages-over-null-values][read more about them here]].
+
+** Our first enum
+*EXERCISE 4*: Implement an ~enum~ called ~HandShape~ for all the hand shapes.
+
+When you try to replace the strings with your new, fancy ~HandShape~ ~enum~ you'll notice that it won't compile. The reason is that the compiler doesn't know how to do comparisons between ~HandShape~ instances; nowhere have we told it how we want equality comparisons to work. Fortunately we do not have to write code for this ourselves.
+
+** Derivable traits and the derive macro
+Traits define a behavior contract that a type can adhere to, very similar to interfaces in other languages. Often you have to provide an implementation for the functions that a trait specifies, but some traits are *derivable*, that means that the Rust compiler can automatically generate the necessary code for us instead! Common derivable traits are ~PartialEq~ for equality comparisons and ~Debug~ for printing the type.
+
+#+begin_src rust
+  #[derive(PartialEq, Debug)]
+  enum HandShape {
+      Rock,
+      Paper,
+      Scissors,
+  }
+
+  // Now we can compare: HandShape::Rock != HandShape::Scissors
+  // And log our HandShape: println!("{:?}", HandShape::Rock);
+#+end_src
+
+*EXERCISE 5:* Make your ~HandShape~ enum derive ~PartialEq~ and ~Debug~.
+
+** Pattern matching
+One of the most useful features of Rust is its pattern matching capabilities, it's like a ~switch~ on steroids which not only helps you avoid complicated ~if~ chains, but also checks for exhaustiveness making sure you handle all of the possible scenarios.
+
+#+begin_src rust
+  let foo = 666;
+
+  match foo {
+      666 => println!("The beast!"),
+      665 => println!("The neighbor of the beast!"),
+      _ => println!("Not the beast..."),
+  }
+#+end_src
+
+*EXERCISE 6*: Replace your implementation with a match clause (Hint: you can build ad-hoc tuples: ~(x, y)~).
+
+All tests should be passing now, yay!
+
+** What about draws?
+Currently our ~is_winner~ function only returns a ~bool~. There's no way for us to indicate a draw! Let's use an enum to encapsulate the three different possible round results.
+
+*EXERCISE 7:* Implement a ~RoundResult~ enum which captures the three possible states: win, loss or draw.
+
+*EXERCISE 8:* Add tests for the draw cases and then add the draw handling functionality to the ~is_winner~ function.
+
+** A little refactoring...
+Now that we have our logic down we are ready to move on to focusing on interacting with the outside world. However, before we go there we need just a little bit of clean-up.
+
+The name ~is_winner~ made sense when all we did was return a ~bool~. Now that we are returning a ~RoundResult~ we should revisit the name to make our code a bit clearer. Let's rename it to ~execute_round~ and add a doc string to explain that result is from the perspective of the left-hand argument.
+
+*EXERCISE 9:* Rename ~is_winner~ to ~execute_round~ and add a doc string to it (using ~///~).
+
+Our main.rs file is getting a bit long as well. Ideally we want the main.rs file to short and only focus on running the application. Let's create a new file: lib.rs and move all our game logic there.
+
+*EXERCISE 10:* Move everything except the ~main~ function into a file called /lib.rs/.
+
+If you run the tests again now you will see a bunch of warnings about dead code and things not being used. This is because lib.rs is a separate module from main.rs which is our entrypoint to the application. All of our functions and enums currently live in lib.rs and since everything is *private by default* in Rust, no-one is able to use them. Let's fix that by marking the functions with ~pub~ and thus make them publicly exposed.
+
+*EXERCISE 11:* Make the functions and enums in lib.rs public.
+
+When you run the tests now you'll notice that not only did the warnings disappear, we've gotten an additional paragraph for Doc-tests in the output, what's up with that?
+
+** Documentation
+Another great feature of Rust is the focus on documentation: Cargo comes with built-in documentation capabilities. All comments starting with ~///~ are so-called doc strings and can be extracted into a standardized documentation website by running:
+
+#+begin_src shell
+  $ cargo doc --open
+#+end_src
+
+Doc strings are written in markdown and support adding code examples as in regular markdown. Code examples in doc strings for public functions will be executed when running ~cargo test~ which is great since it ensures the examples compile and are up-to-date. Now, let's add a simple doc test for ~execute_round~.
+
+*EXERCISE 12*: Add a doc test for ~execute_round~. (Hint: you can import your functions and enums with ~use janken::*;.~)
+
+* Interacting with the outside world
+Let's shift our focus back to main.rs and turn our game logic into an actual game.
+
+** Reading input from stdin
+Reading from stdin looks a little bit different than in Node.js or Python in that you first allocate a buffer string to populate:
+
+#+begin_src rust
+  // Prepare a buffer to write the data into
+  let mut buffer = String::new();
+  // Get a handle to stdin
+  let stdin = std::io::stdin();
+
+  println!("Write something:");
+
+  // Read a line
+  stdin.read_line(&mut buffer).unwrap();
+
+  // Print the result
+  println!("You wrote: {}", buffer);
+#+end_src
+
+*EXERCISE 13*: Add the code above to your ~main~ function and run it with ~cargo run~.
+
+In Rust everything is immutable by default, that is: once you set a variable you can't modify its value. In order to allow modification of a variable you have to declare it as mutable with the ~mut~ keyword.
+
+If you have sharp eyes you might have noticed something else that stand out in the code above: what is that ~unwrap()~ call doing?
+
+** Error handling in Rust
+Let's remove the ~unwrap()~ call and run our application again!
+
+*EXERCISE 14*: Remove the ~unwrap()~ call and run ~cargo check~.
+
+#+begin_src shell
+  warning: unused `Result` that must be used
+   --> src/main.rs:9:5
+    |
+  9 |     stdin.read_line(&mut buffer);
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_must_use)]` on by default
+    = note: this `Result` may be an `Err` variant, which should be handled
+#+end_src
+
+Things can fail, especially when you're interacting with the outside world you don't know who and what you can trust. In Rust things that can fail are encapsulated in a ~Result<T, E>~ enum type which has two members ~Ok(T)~ and ~Err(E)~. ~T~ and ~E~ are generic type parameters and are placeholders for any type; this is called generics and works on the surface similarly to generics in TypeScript.
+
+If you look at the type signature of ~stdin.readline()~ you will see that it has a return type of ~std::io::Result<usize>~. That means that it will either return a ~Ok(usize)~ with the number of bytes read, or an ~Err(std::io::Error)~. ~usize~ is one of Rust's many numeric types and represents the unsigned default integer size for your computer (most likely 64 bit or 32 bit).
+
+By using ~unwrap()~ we discardi the error handling and blindly trust the operation will succeed. This is not great since if the operation fails we're not giving the user, or us for that matter, any relevant information about what failed. We can do better!
+
+Since it's an enum we can treat it like we did our other enums: ~match~!
+
+#+begin_src rust
+  match stdin.read_line(&mut buffer) {
+      Ok(_) => {
+          println!("You wrote: {}", buffer);
+      }
+      Err(err) => {
+          println!("Failed to read user input! {:?}", err);
+      }
+  }
+#+end_src
+
+The above pattern quickly becomes unwieldy and if we don't want to deal with the underlying error can use ~expect~ instead which allows us to provide a message if the operation fails:
+
+#+begin_src rust
+  stdin
+      .read_line(&mut buffer)
+      .expect("Failed to read from stdin");
+#+end_src
+
+The most idiomatic way however, and the one that combines brevity with explicitness is the ~?~ operator. By appending the ~?~ operator to a function call the call will either return the value inside the ~Ok~ type, or abort the parent function returning the error. This means we have to do a few changes to our ~main~ function:
+
+#+begin_src rust
+  fn main() -> Result<(), io::Error> {
+      let mut buffer = String::new();
+      let stdin = io::stdin();
+
+      println!("Write something:");
+
+      stdin.read_line(&mut buffer)?;
+
+      println!("You wrote: {}", buffer);
+
+      Ok(())
+  }
+#+end_src
+
+*EXERCISE 15:* Add error handling using the ~?~ operator.
+
+We've changed the return type to be a result of either ~Ok(())~, where ~()~ is void (similar here to ~undefined~ in JavaScript), or ~Err(io::Error)~. Now we can happily add the ~?~ operator to the ~read_line~ call as long as we remember to return a result as well.
+
+There are more sophisticated ways to handle errors, but this is good enough for now!
+
+** Turning user input into HandShape
+Before we can call our ~execute_round~ function we need to take the user input and convert it into a ~HandShape~. Let's implement a function ~to_handshape(s: String) -> Result<HandShape, String>~ (we'll use ~String~ as the error type) which can turn the user input into a ~HandShape~.
+
+*EXERCISE 16*: Implement ~to_handshape~ as described above.
+
+*** The TryFrom trait
+While the above approach works in Rust we often rely on methods like ~from()~, ~into()~, ~try_from()~ and ~try_into()~ to convert between types. You can add these methods to your type by implementing the traits ~From<T>~ and ~TryFrom<T>~. In our case we'll need the ~TryFrom~ trait since we cannot turn every possible user input into a ~HandShape~.
+
+*EXERCISE 17*: Implement ~TryFrom<String>~ for ~HandShape~ and replace the call to ~to_handshape~ with ~HandShape::try_from(buffer)~.
+
+*** String and &str
+One thing you quickly stumble upon in Rust is the fact that it has two types of strings: ~String~ and ~&str~. ~String~ is a mutable, heap allocated buffer. That is, you can modify it in place, grow it or shrink it. ~str~, on the other hand, is called a /string slice/ and is an immutable view of a contiguous sequence of UTF-8 bytes in memory. You almost always encounter ~str~ as a reference: ~&str~. [[https://blog.thoughtram.io/string-vs-str-in-rust/][This blog post]] explains the difference in detail. We will briefly touch upon what a reference is when we go into ownership and borrowing.
+
+In short, in-line strings in your code will always be of type ~&str~ unless you explicitly turn them into ~String~:s. As a beginner ~String~:s are a bit easier to work with since you don't have to think about ownership and lifetimes as much.
+
+** Our game loop
+Now we should have all the pieces we need to start implementing our actual game loop. There are many ways to loop in Rust:
+
++ ~loop~ is for infinite loops (which you can ~break~ out of)
++ ~while~ for looping until a predicate is false
++ ~for~ is for iterating over a iterator until it is empty
+
+*EXERCISE 18:* Implement a game loop which loops until the player either wins or loses.
+
+For now you can hard-code the computer's choice, we'll look into handling the computer player soon.
+
+At this point you most likely have had the compiler, at one time or another, kindly tell you that you are using a value after it has been moved. Let's dig a little deeper into what that actually means and what we can do to resolve that kind of error.
+
+*** Ownership and borrowing
+Rust has an memory model based on ownership, it helps us with variable allocation and deallocation and makes sure we're not trying to access or use a variable that has been deallocated, a so called null pointer. What it means in practice is that a value can only have *a single owner* at any given time. When you reassign a value to another variable the value is *moved* to the new variable and ownership transferred. If the value type implements the ~Copy~ trait the value will be copied to the new variable without any transferal of ownership. On the [[https://doc.rust-lang.org/std/marker/trait.Copy.html#implementors][Copy trait's documentation page]] you can easily see what native types implement it. See the example below:
+
+#+begin_src rust
+  let foo = String::from("Hello!");
+  // value is moved to `bar` here
+  let bar = foo;
+
+  // Can't borrow `foo`s value here since it has been moved
+  println!("foo: {}", foo);
+
+  let x: usize = 42;
+  // Since `usize` implements `Copy` the value is copied to
+  // `y` instead of moved
+  let y = x;
+
+  // Which means that `x` can be safely borrowed by `println!()`
+  println!("x: {}", x);
+#+end_src
+
+What makes ownership so important is that it controls memory deallocation of the varible: the value is deallocated when its owner variable goes out of scope. In Rust terminology we say that the variable has been /dropped/. It enables automatic memory management without a garbage collector.
+
+In the following example we hit a borrow after move error where we try and read the user input into ~buffer~.
+
+#+begin_src rust
+  fn main() -> Result<(), io::Error> {
+      let stdin = io::stdin();
+      // The String buffer is allocated outside of the `loop`
+      let mut buffer = String::new();
+
+      loop {
+          println!("Rock, paper or scissors?");
+          // Borrow after move occurs here...
+          stdin.read_line(&mut buffer)?;
+
+          // ...since the value was here in the previous iteration
+          if let Ok(shape) = HandShape::try_from(buffer) {
+              match execute_round(shape, HandShape::Paper) {
+                  // ...
+              }
+          } else {
+              println!("Sorry, I didn't quite get that...");
+          }
+      }
+
+      Ok(())
+  }
+#+end_src
+
+*EXERCISE 19:* Figure out a way to resolve the borrow-after-move error. (Spoiler alert below)
+
+How can we solve this issue? A quick and dirty solution is to move the String allocation into the loop so we get a new one on every iteration. But let's say that we're all of sudden extremely concerned with the performance and memory footprint of our application and thus we don't want to allocate new String instances when we don't need to: how do we solve it then?
+
+Why is the ~buffer~ String moved into ~HandShape::try_from()~? Function parameters work just like variable assignments in that they take ownership of the value if its type does not implement the ~Copy~ trait. As we've seen in the example above ~String~ does not. However there's another option, /references/. References are prefixed with the ~&~ operator.
+
+#+begin_src rust
+  let foo = String::from("Hello!");
+  // `bar` is assigned to a reference of `foo`, so ownership is not
+  // transferred.
+  let bar = &foo;
+
+  // Which means this is fine!
+  println!("foo: {}", foo);
+#+end_src
+
+By using a reference we are not setting the variable to the actual value but a referential pointer to it, so ownership is not transferred. Creating a reference is called /borrowing/ in Rust terminology. [[https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html][This chapter in the Rust language book]] explains references and borrowing in more detail.
+
+*EXERCISE 20:* Change the ~TryFrom<String>~ implementation to ~TryFrom<&String>~.
+
+The practice of taking references instead of values in function parameters is called pass-by-reference and should be preferred if possible to pass-by-value with which you can easily end up battling the Rust borrow checker.
+
+There are more improvements we can do but we will leave it here for now. If you are interested even more idiomatic ways of solving the above issue you can have a look at [[https://github.com/iensu/janken/commit/3fa1267fc3f331e4e752fa35853e00b1fc244384][TryFrom<&str> instead of TryFrom<&String>]] and [[https://github.com/iensu/janken/commit/78a54d4b74fa651c5faa518414992d731f967097][Implementing FromStr instead of TryFrom]].
+
+** Making it random
+Currently our adversary is just responding with the same hand shape everytime, not much fun at all. We need a way to make it respond with different shapes each time. Oddly enough Rust does not provide an easy way of generating random numbers in its standard library, so we will have to some foraging to find a suitable package on https://crates.io, Rust's crate registry.
+
+Among the most popular crates we see [[https://crates.io/crates/rand][the rand crate]] which is the go-to crate for all your randomization needs.
+
+*EXERCISE 21:* Add ~rand~ as a dependency in Cargo.toml:
+
+#+begin_src toml
+  [package]
+  name = "janken"
+  version = "0.1.0"
+  edition = "2021"
+
+  [dependencies]
+  rand = "0.8.4"
+#+end_src
+
+*EXERCISE 22:* Have a look at [[https://rust-random.github.io/book/guide-start.html][the rand documentation]] and find a way to generate a random ~HandShape~.
+
+You did it! You have built a very simple, but functional, implementation of rock, paper, scissors in Rust. However, we have barely scratched the surface of what the Rust language has to offer, we haven't even touched upon ~struct~:s, lifetimes or iterator patterns for instance. While there is still a lot more to discover, you should at least have gotten a sense of the Rust workflow and the language itself. Now it's up to you to either take your /janken/ application to new heights, or find some other project to implement and learn more of Rust.
+
+* Where to go next
+If I managed to whet your appetite for more, here are a some great resources I found very useful when learning Rust:
+
+*Getting started*
+- [[https://doc.rust-lang.org/book/][The Rust Book]]
+- [[https://github.com/rust-lang/rustlings/][The Rustlings course]]
+- [[https://doc.rust-lang.org/stable/rust-by-example/][Rust by Example]]
+- [[https://www.youtube.com/c/RyanLevicksVideos/videos][Ryan Levick's Rust videos]]
+- [[https://pragprog.com/titles/khrust/programming-webassembly-with-rust/][Programming WebAssembly with Rust]]
+
+*Intermediate*
+- [[https://doc.rust-lang.org/std/index.html][Standard library documentation]]
+- [[https://www.zero2prod.com/index.html?country=Sweden&discount_code=VAT20][Zero To Production in Rust]]
+- [[https://www.youtube.com/playlist?list=PLqbS7AVVErFiWDOAVrPt7aYmnuuOLYvOa][Crust of Rust]] (Video series by Jon Gjengset)
+
+*Advanced*
+- [[https://www.youtube.com/c/JonGjengset/featured][Jon Gjengset's other Rust videos]]
