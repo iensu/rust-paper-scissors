@@ -94,7 +94,7 @@ Now when you try to run the tests the code will not compile since the ~is_winner
 
 Now we are able to run the test, but it fails with the message /not yet implemented/.
 
-*EXERCISE 2:* Make the test pass.
+*EXERCISE 2:* Make the test pass and a test case for when ~is_winner~ should return ~false~.
 
 *EXERCISE 3:* Follow the same procedure and implement the remaining two cases.
 
