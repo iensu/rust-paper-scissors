@@ -11,8 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install emacs
-        run: sudo apt-get update && sudo apt-get install emacs
+      - name: Install Emacs
+        run: sudo snap install emacs --classic
+
+      - name: Show Emacs version
+        run: emacs --version
 
       - name: Build site
         run: ./build.sh
