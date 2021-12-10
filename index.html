@@ -37,7 +37,7 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
+    overflow: auto;
     padding-top: 1.2em;
   }
   pre.src:before {
@@ -49,7 +49,7 @@
     padding: 3px;
     border: 1px solid black;
   }
-  pre.src:hover:before { display: inline;}
+  pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
@@ -158,6 +158,19 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -180,50 +193,26 @@
 <link rel="stylesheet" type="text/css" href="assets/htmlize.css" />
 <link rel="stylesheet" type="text/css" href="assets/style-overrides.css" />
 <script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*///-->
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
 </script>
 </head>
 <body>
@@ -273,8 +262,8 @@ There is <a href="https://github.com/iensu/janken/">a reference repository</a> w
 As the article progresses more assumptions will be made about the code you have written. For instance, I make the assumption that you will write code that follows idiomatic JavaScript or Python patterns and will introduce rustier ways of doing things as we go along. The reason being that I want you to solve the exercise yourself first and keep blind code copying to a minimum. If your solution starts to diverge and you end up at a place where my instructions do not make sense, most likely you've thought ahead so move on to the next step.
 </p>
 
-<div id="outline-container-orgc224693" class="outline-2">
-<h2 id="orgc224693"><span class="section-number-2">1</span> Humble beginnings</h2>
+<div id="outline-container-orga64bda9" class="outline-2">
+<h2 id="orga64bda9"><span class="section-number-2">1</span> Humble beginnings</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 We need to create a project for our app, but before that we need a name. Let's call it <i>janken</i> (じゃん拳), the Japanese name for the game. You can create your project using <code>cargo</code>:
@@ -316,8 +305,8 @@ We need to be able to decide who the winner is so let's create a function that t
 </p>
 </div>
 
-<div id="outline-container-orgbb94b07" class="outline-3">
-<h3 id="orgbb94b07"><span class="section-number-3">1.1</span> Writing tests</h3>
+<div id="outline-container-org763e18f" class="outline-3">
+<h3 id="org763e18f"><span class="section-number-3">1.1</span> Writing tests</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 In Rust we usually write tests in a private module in the same file (<b>module</b>) as the implementation.
@@ -352,8 +341,8 @@ In Rust we usually write tests in a private module in the same file (<b>module</
 </div>
 </div>
 
-<div id="outline-container-org3056dbd" class="outline-3">
-<h3 id="org3056dbd"><span class="section-number-3">1.2</span> Partial implementations</h3>
+<div id="outline-container-orgca9ea91" class="outline-3">
+<h3 id="orgca9ea91"><span class="section-number-3">1.2</span> Partial implementations</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Now when you try to run the tests the code will not compile since the <code>is_winner</code> function has not yet been defined. Often you will want to try things out before you've figured out all the details of your implementation and made the code compile. Rust has a neat feature for this: the <code>todo!()</code> macro. The <code>todo!()</code> macro will allow your code to compile without you having finished the implementation.
@@ -381,8 +370,8 @@ Now we are able to run the test, but it fails with the message <i>not yet implem
 </div>
 </div>
 
-<div id="outline-container-orgac297c1" class="outline-2">
-<h2 id="orgac297c1"><span class="section-number-2">2</span> Rustifying the code</h2>
+<div id="outline-container-org19c8d7e" class="outline-2">
+<h2 id="org19c8d7e"><span class="section-number-2">2</span> Rustifying the code</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 There are multiple issues with our <code>is_winner</code> function, for one it does not handle draws yet (we will address that later).
@@ -393,8 +382,8 @@ Another issue is that the current implementation does not properly codify the do
 </p>
 </div>
 
-<div id="outline-container-org40c7d78" class="outline-3">
-<h3 id="org40c7d78"><span class="section-number-3">2.1</span> Our first enum</h3>
+<div id="outline-container-org71553fe" class="outline-3">
+<h3 id="org71553fe"><span class="section-number-3">2.1</span> Our first enum</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <b>EXERCISE 4</b>: Implement an <code>enum</code> called <code>HandShape</code> for all the hand shapes.
@@ -406,8 +395,8 @@ When you try to replace the strings with your new, fancy <code>HandShape</code> 
 </div>
 </div>
 
-<div id="outline-container-org70fbe57" class="outline-3">
-<h3 id="org70fbe57"><span class="section-number-3">2.2</span> Derivable traits and the derive macro</h3>
+<div id="outline-container-org005ee04" class="outline-3">
+<h3 id="org005ee04"><span class="section-number-3">2.2</span> Derivable traits and the derive macro</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Traits define a behavior contract that a type can adhere to, very similar to interfaces in other languages. Often you have to provide an implementation for the functions that a trait specifies, but some traits are <b>derivable</b>, that means that the Rust compiler can automatically generate the necessary code for us instead! Common derivable traits are <code>PartialEq</code> for equality comparisons and <code>Debug</code> for printing the type.
@@ -432,8 +421,8 @@ Traits define a behavior contract that a type can adhere to, very similar to int
 </div>
 </div>
 
-<div id="outline-container-orgf6492e2" class="outline-3">
-<h3 id="orgf6492e2"><span class="section-number-3">2.3</span> Pattern matching</h3>
+<div id="outline-container-org08a03ed" class="outline-3">
+<h3 id="org08a03ed"><span class="section-number-3">2.3</span> Pattern matching</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 One of the most useful features of Rust is its pattern matching capabilities, it's like a <code>switch</code> on steroids which not only helps you avoid complicated <code>if</code> chains, but also checks for exhaustiveness making sure you handle all of the possible scenarios.
@@ -460,8 +449,8 @@ All tests should be passing now, yay!
 </div>
 </div>
 
-<div id="outline-container-orgdabe209" class="outline-3">
-<h3 id="orgdabe209"><span class="section-number-3">2.4</span> What about draws?</h3>
+<div id="outline-container-orge9e8976" class="outline-3">
+<h3 id="orge9e8976"><span class="section-number-3">2.4</span> What about draws?</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Currently our <code>is_winner</code> function only returns a <code>bool</code>. There's no way for us to indicate a draw! Let's use an enum to encapsulate the three different possible round results.
@@ -477,8 +466,8 @@ Currently our <code>is_winner</code> function only returns a <code>bool</code>. 
 </div>
 </div>
 
-<div id="outline-container-orgfcf9a3e" class="outline-3">
-<h3 id="orgfcf9a3e"><span class="section-number-3">2.5</span> A little refactoring&#x2026;</h3>
+<div id="outline-container-org64f32f7" class="outline-3">
+<h3 id="org64f32f7"><span class="section-number-3">2.5</span> A little refactoring&#x2026;</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Now that we have our logic down we are ready to move on to focusing on interacting with the outside world. However, before we go there we need just a little bit of clean-up.
@@ -514,8 +503,8 @@ When you run the tests now you'll notice that not only did the warnings disappea
 </div>
 </div>
 
-<div id="outline-container-orgbb86eff" class="outline-3">
-<h3 id="orgbb86eff"><span class="section-number-3">2.6</span> Documentation</h3>
+<div id="outline-container-org1886f71" class="outline-3">
+<h3 id="org1886f71"><span class="section-number-3">2.6</span> Documentation</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 Another great feature of Rust is the focus on documentation: Cargo comes with built-in documentation capabilities. All comments starting with <code>///</code> are so-called doc strings and can be extracted into a standardized documentation website by running:
@@ -537,16 +526,16 @@ Doc strings are written in markdown and support adding code examples as in regul
 </div>
 </div>
 
-<div id="outline-container-org2cc5f90" class="outline-2">
-<h2 id="org2cc5f90"><span class="section-number-2">3</span> Interacting with the outside world</h2>
+<div id="outline-container-org2f3dce3" class="outline-2">
+<h2 id="org2f3dce3"><span class="section-number-2">3</span> Interacting with the outside world</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Let's shift our focus back to main.rs and turn our game logic into an actual game.
 </p>
 </div>
 
-<div id="outline-container-org58dd035" class="outline-3">
-<h3 id="org58dd035"><span class="section-number-3">3.1</span> Reading input from stdin</h3>
+<div id="outline-container-org0b9d564" class="outline-3">
+<h3 id="org0b9d564"><span class="section-number-3">3.1</span> Reading input from stdin</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Reading from stdin looks a little bit different than in Node.js or Python in that you first allocate a buffer string to populate:
@@ -582,8 +571,8 @@ If you have sharp eyes you might have noticed something else that stand out in t
 </div>
 </div>
 
-<div id="outline-container-org9c0e6f7" class="outline-3">
-<h3 id="org9c0e6f7"><span class="section-number-3">3.2</span> Error handling in Rust</h3>
+<div id="outline-container-orgef72686" class="outline-3">
+<h3 id="orgef72686"><span class="section-number-3">3.2</span> Error handling in Rust</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Let's remove the <code>unwrap()</code> call and run our application again!
@@ -678,8 +667,8 @@ There are more sophisticated ways to handle errors, but this is good enough for 
 </div>
 </div>
 
-<div id="outline-container-orgd0d4072" class="outline-3">
-<h3 id="orgd0d4072"><span class="section-number-3">3.3</span> Turning user input into HandShape</h3>
+<div id="outline-container-orgc72848f" class="outline-3">
+<h3 id="orgc72848f"><span class="section-number-3">3.3</span> Turning user input into HandShape</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 Before we can call our <code>execute_round</code> function we need to take the user input and convert it into a <code>HandShape</code>. Let's implement a function <code>to_handshape(s: String) -&gt; Result&lt;HandShape, String&gt;</code> (we'll use <code>String</code> as the error type) which can turn the user input into a <code>HandShape</code>.
@@ -690,9 +679,9 @@ Before we can call our <code>execute_round</code> function we need to take the u
 </p>
 </div>
 
-<div id="outline-container-orgc88df74" class="outline-4">
-<h4 id="orgc88df74">The TryFrom trait</h4>
-<div class="outline-text-4" id="text-orgc88df74">
+<div id="outline-container-orgf1aca06" class="outline-4">
+<h4 id="orgf1aca06">The TryFrom trait</h4>
+<div class="outline-text-4" id="text-orgf1aca06">
 <p>
 While the above approach works in Rust we often rely on methods like <code>from()</code>, <code>into()</code>, <code>try_from()</code> and <code>try_into()</code> to convert between types. You can add these methods to your type by implementing the traits <code>From&lt;T&gt;</code> and <code>TryFrom&lt;T&gt;</code>. In our case we'll need the <code>TryFrom</code> trait since we cannot turn every possible user input into a <code>HandShape</code>.
 </p>
@@ -703,9 +692,9 @@ While the above approach works in Rust we often rely on methods like <code>from(
 </div>
 </div>
 
-<div id="outline-container-org6468044" class="outline-4">
-<h4 id="org6468044">String and &amp;str</h4>
-<div class="outline-text-4" id="text-org6468044">
+<div id="outline-container-orgcd2aaa7" class="outline-4">
+<h4 id="orgcd2aaa7">String and &amp;str</h4>
+<div class="outline-text-4" id="text-orgcd2aaa7">
 <p>
 One thing you quickly stumble upon in Rust is the fact that it has two types of strings: <code>String</code> and <code>&amp;str</code>. <code>String</code> is a mutable, heap allocated buffer. That is, you can modify it in place, grow it or shrink it. <code>str</code>, on the other hand, is called a <i>string slice</i> and is an immutable view of a contiguous sequence of UTF-8 bytes in memory. You almost always encounter <code>str</code> as a reference: <code>&amp;str</code>. <a href="https://blog.thoughtram.io/string-vs-str-in-rust/">This blog post</a> explains the difference in detail. We will briefly touch upon what a reference is when we go into ownership and borrowing.
 </p>
@@ -717,8 +706,8 @@ In short, in-line strings in your code will always be of type <code>&amp;str</co
 </div>
 </div>
 
-<div id="outline-container-org8a8daeb" class="outline-3">
-<h3 id="org8a8daeb"><span class="section-number-3">3.4</span> Our game loop</h3>
+<div id="outline-container-org6a0ca5b" class="outline-3">
+<h3 id="org6a0ca5b"><span class="section-number-3">3.4</span> Our game loop</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 Now we should have all the pieces we need to start implementing our actual game loop. There are many ways to loop in Rust:
@@ -743,9 +732,9 @@ At this point you most likely have had the compiler, at one time or another, kin
 </p>
 </div>
 
-<div id="outline-container-org4d3ce0a" class="outline-4">
-<h4 id="org4d3ce0a">Ownership and borrowing</h4>
-<div class="outline-text-4" id="text-org4d3ce0a">
+<div id="outline-container-orgb501265" class="outline-4">
+<h4 id="orgb501265">Ownership and borrowing</h4>
+<div class="outline-text-4" id="text-orgb501265">
 <p>
 Rust has an memory model based on ownership, it helps us with variable allocation and deallocation and makes sure we're not trying to access or use a variable that has been deallocated, a so called null pointer. What it means in practice is that a value can only have <b>a single owner</b> at any given time. When you reassign a value to another variable the value is <b>moved</b> to the new variable and ownership transferred. If the value type implements the <code>Copy</code> trait the value will be copied to the new variable without any transferal of ownership. On the <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html#implementors">Copy trait's documentation page</a> you can easily see what native types implement it. See the example below:
 </p>
@@ -844,8 +833,8 @@ There are more improvements we can do but we will leave it here for now. If you 
 </div>
 </div>
 
-<div id="outline-container-orgd2017a5" class="outline-3">
-<h3 id="orgd2017a5"><span class="section-number-3">3.5</span> Making it random</h3>
+<div id="outline-container-org899b083" class="outline-3">
+<h3 id="org899b083"><span class="section-number-3">3.5</span> Making it random</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 Currently our adversary is just responding with the same hand shape everytime, not much fun at all. We need a way to make it respond with different shapes each time. Oddly enough Rust does not provide an easy way of generating random numbers in its standard library, so we will have to some foraging to find a suitable package on <a href="https://crates.io">https://crates.io</a>, Rust's crate registry.
@@ -881,8 +870,8 @@ You did it! You have built a very simple, but functional, implementation of rock
 </div>
 </div>
 
-<div id="outline-container-orge0246b8" class="outline-2">
-<h2 id="orge0246b8"><span class="section-number-2">4</span> Where to go next</h2>
+<div id="outline-container-orgac28625" class="outline-2">
+<h2 id="orgac28625"><span class="section-number-2">4</span> Where to go next</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 If I managed to whet your appetite for more, here are a some great resources I found very useful when learning Rust:
@@ -919,7 +908,6 @@ If I managed to whet your appetite for more, here are a some great resources I f
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Jens Östlund</p>
-<p class="validation"></p>
 </div>
 </body>
 </html>
