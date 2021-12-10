@@ -1,0 +1,25 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-emacs-config-page:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install emacs
+        run: apt update && apt install emacs
+
+      - name: Build site
+        run: ./build.sh
+
+      - name: Deploy GH Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: docs
