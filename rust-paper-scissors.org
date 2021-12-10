@@ -5,7 +5,8 @@
 #+options: toc:nil
 #+options: num:2
 #+export_file_name: docs/index.html
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="style-overrides.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="assets/htmlize.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="assets/style-overrides.css" />
 
 /This text is an outline for a hands-on Rust workshop for beginners held at [[https://futurice.com/][Futurice]]. The content is geared towards developers with a background in more dynamic languages such as JavaScript or Python but who has no prior experience coding in Rust./
 
@@ -59,7 +60,6 @@ We need to be able to decide who the winner is so let's create a function that t
 In Rust we usually write tests in a private module in the same file (*module*) as the implementation.
 
 #+begin_src rust
-
   // This annotation makes sure the `tests` module is
   // only compiled when running tests.
   #[cfg(test)]
