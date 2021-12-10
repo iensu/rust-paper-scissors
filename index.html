@@ -6,214 +6,9 @@
 <title>Rust, Paper, Scissors</title>
 <meta name="generator" content="Org mode">
 <meta name="author" content="Jens Östlund">
-<style type="text/css">
- <!--/*--><![CDATA[/*><!--*/
-  .title  { text-align: center;
-             margin-bottom: .2em; }
-  .subtitle { text-align: center;
-              font-size: medium;
-              font-weight: bold;
-              margin-top:0; }
-  .todo   { font-family: monospace; color: red; }
-  .done   { font-family: monospace; color: green; }
-  .priority { font-family: monospace; color: orange; }
-  .tag    { background-color: #eee; font-family: monospace;
-            padding: 2px; font-size: 80%; font-weight: normal; }
-  .timestamp { color: #bebebe; }
-  .timestamp-kwd { color: #5f9ea0; }
-  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
-  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
-  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
-  .underline { text-decoration: underline; }
-  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
-  p.verse { margin-left: 3%; }
-  pre {
-    border: 1px solid #ccc;
-    box-shadow: 3px 3px 3px #eee;
-    padding: 8pt;
-    font-family: monospace;
-    overflow: auto;
-    margin: 1.2em;
-  }
-  pre.src {
-    position: relative;
-    overflow: auto;
-    padding-top: 1.2em;
-  }
-  pre.src:before {
-    display: none;
-    position: absolute;
-    background-color: white;
-    top: -10px;
-    right: 10px;
-    padding: 3px;
-    border: 1px solid black;
-  }
-  pre.src:hover:before { display: inline; margin-top: 14px;}
-  /* Languages per Org manual */
-  pre.src-asymptote:before { content: 'Asymptote'; }
-  pre.src-awk:before { content: 'Awk'; }
-  pre.src-C:before { content: 'C'; }
-  /* pre.src-C++ doesn't work in CSS */
-  pre.src-clojure:before { content: 'Clojure'; }
-  pre.src-css:before { content: 'CSS'; }
-  pre.src-D:before { content: 'D'; }
-  pre.src-ditaa:before { content: 'ditaa'; }
-  pre.src-dot:before { content: 'Graphviz'; }
-  pre.src-calc:before { content: 'Emacs Calc'; }
-  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-fortran:before { content: 'Fortran'; }
-  pre.src-gnuplot:before { content: 'gnuplot'; }
-  pre.src-haskell:before { content: 'Haskell'; }
-  pre.src-hledger:before { content: 'hledger'; }
-  pre.src-java:before { content: 'Java'; }
-  pre.src-js:before { content: 'Javascript'; }
-  pre.src-latex:before { content: 'LaTeX'; }
-  pre.src-ledger:before { content: 'Ledger'; }
-  pre.src-lisp:before { content: 'Lisp'; }
-  pre.src-lilypond:before { content: 'Lilypond'; }
-  pre.src-lua:before { content: 'Lua'; }
-  pre.src-matlab:before { content: 'MATLAB'; }
-  pre.src-mscgen:before { content: 'Mscgen'; }
-  pre.src-ocaml:before { content: 'Objective Caml'; }
-  pre.src-octave:before { content: 'Octave'; }
-  pre.src-org:before { content: 'Org mode'; }
-  pre.src-oz:before { content: 'OZ'; }
-  pre.src-plantuml:before { content: 'Plantuml'; }
-  pre.src-processing:before { content: 'Processing.js'; }
-  pre.src-python:before { content: 'Python'; }
-  pre.src-R:before { content: 'R'; }
-  pre.src-ruby:before { content: 'Ruby'; }
-  pre.src-sass:before { content: 'Sass'; }
-  pre.src-scheme:before { content: 'Scheme'; }
-  pre.src-screen:before { content: 'Gnu Screen'; }
-  pre.src-sed:before { content: 'Sed'; }
-  pre.src-sh:before { content: 'shell'; }
-  pre.src-sql:before { content: 'SQL'; }
-  pre.src-sqlite:before { content: 'SQLite'; }
-  /* additional languages in org.el's org-babel-load-languages alist */
-  pre.src-forth:before { content: 'Forth'; }
-  pre.src-io:before { content: 'IO'; }
-  pre.src-J:before { content: 'J'; }
-  pre.src-makefile:before { content: 'Makefile'; }
-  pre.src-maxima:before { content: 'Maxima'; }
-  pre.src-perl:before { content: 'Perl'; }
-  pre.src-picolisp:before { content: 'Pico Lisp'; }
-  pre.src-scala:before { content: 'Scala'; }
-  pre.src-shell:before { content: 'Shell Script'; }
-  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
-  /* additional language identifiers per "defun org-babel-execute"
-       in ob-*.el */
-  pre.src-cpp:before  { content: 'C++'; }
-  pre.src-abc:before  { content: 'ABC'; }
-  pre.src-coq:before  { content: 'Coq'; }
-  pre.src-groovy:before  { content: 'Groovy'; }
-  /* additional language identifiers from org-babel-shell-names in
-     ob-shell.el: ob-shell is the only babel language using a lambda to put
-     the execution function name together. */
-  pre.src-bash:before  { content: 'bash'; }
-  pre.src-csh:before  { content: 'csh'; }
-  pre.src-ash:before  { content: 'ash'; }
-  pre.src-dash:before  { content: 'dash'; }
-  pre.src-ksh:before  { content: 'ksh'; }
-  pre.src-mksh:before  { content: 'mksh'; }
-  pre.src-posh:before  { content: 'posh'; }
-  /* Additional Emacs modes also supported by the LaTeX listings package */
-  pre.src-ada:before { content: 'Ada'; }
-  pre.src-asm:before { content: 'Assembler'; }
-  pre.src-caml:before { content: 'Caml'; }
-  pre.src-delphi:before { content: 'Delphi'; }
-  pre.src-html:before { content: 'HTML'; }
-  pre.src-idl:before { content: 'IDL'; }
-  pre.src-mercury:before { content: 'Mercury'; }
-  pre.src-metapost:before { content: 'MetaPost'; }
-  pre.src-modula-2:before { content: 'Modula-2'; }
-  pre.src-pascal:before { content: 'Pascal'; }
-  pre.src-ps:before { content: 'PostScript'; }
-  pre.src-prolog:before { content: 'Prolog'; }
-  pre.src-simula:before { content: 'Simula'; }
-  pre.src-tcl:before { content: 'tcl'; }
-  pre.src-tex:before { content: 'TeX'; }
-  pre.src-plain-tex:before { content: 'Plain TeX'; }
-  pre.src-verilog:before { content: 'Verilog'; }
-  pre.src-vhdl:before { content: 'VHDL'; }
-  pre.src-xml:before { content: 'XML'; }
-  pre.src-nxml:before { content: 'XML'; }
-  /* add a generic configuration mode; LaTeX export needs an additional
-     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
-  pre.src-conf:before { content: 'Configuration File'; }
-
-  table { border-collapse:collapse; }
-  caption.t-above { caption-side: top; }
-  caption.t-bottom { caption-side: bottom; }
-  td, th { vertical-align:top;  }
-  th.org-right  { text-align: center;  }
-  th.org-left   { text-align: center;   }
-  th.org-center { text-align: center; }
-  td.org-right  { text-align: right;  }
-  td.org-left   { text-align: left;   }
-  td.org-center { text-align: center; }
-  dt { font-weight: bold; }
-  .footpara { display: inline; }
-  .footdef  { margin-bottom: 1em; }
-  .figure { padding: 1em; }
-  .figure p { text-align: center; }
-  .equation-container {
-    display: table;
-    text-align: center;
-    width: 100%;
-  }
-  .equation {
-    vertical-align: middle;
-  }
-  .equation-label {
-    display: table-cell;
-    text-align: right;
-    vertical-align: middle;
-  }
-  .inlinetask {
-    padding: 10px;
-    border: 2px solid gray;
-    margin: 10px;
-    background: #ffffcc;
-  }
-  #org-div-home-and-up
-   { text-align: right; font-size: 70%; white-space: nowrap; }
-  textarea { overflow-x: auto; }
-  .linenr { font-size: smaller }
-  .code-highlighted { background-color: #ffff00; }
-  .org-info-js_info-navigation { border-style: none; }
-  #org-info-js_console-label
-    { font-size: 10px; font-weight: bold; white-space: nowrap; }
-  .org-info-js_search-highlight
-    { background-color: #ffff00; color: #000000; font-weight: bold; }
-  .org-svg { width: 90%; }
-  /*]]>*/-->
-</style>
-<link rel="stylesheet" type="text/css" href="assets/htmlize.css" />
-<link rel="stylesheet" type="text/css" href="assets/style-overrides.css" />
-<script type="text/javascript">
-// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
-<!--/*--><![CDATA[/*><!--*/
-     function CodeHighlightOn(elem, id)
-     {
-       var target = document.getElementById(id);
-       if(null != target) {
-         elem.classList.add("code-highlighted");
-         target.classList.add("code-highlighted");
-       }
-     }
-     function CodeHighlightOff(elem, id)
-     {
-       var target = document.getElementById(id);
-       if(null != target) {
-         elem.classList.remove("code-highlighted");
-         target.classList.remove("code-highlighted");
-       }
-     }
-    /*]]>*///-->
-// @license-end
-</script>
+<link rel="stylesheet" href="assets/base.css" />
+<link rel="stylesheet" href="assets/htmlize.css" />
+<link rel="stylesheet" href="assets/style-overrides.css" />
 </head>
 <body>
 <div id="content">
@@ -262,8 +57,8 @@ There is <a href="https://github.com/iensu/janken/">a reference repository</a> w
 As the article progresses more assumptions will be made about the code you have written. For instance, I make the assumption that you will write code that follows idiomatic JavaScript or Python patterns and will introduce rustier ways of doing things as we go along. The reason being that I want you to solve the exercise yourself first and keep blind code copying to a minimum. If your solution starts to diverge and you end up at a place where my instructions do not make sense, most likely you've thought ahead so move on to the next step.
 </p>
 
-<div id="outline-container-orga64bda9" class="outline-2">
-<h2 id="orga64bda9"><span class="section-number-2">1</span> Humble beginnings</h2>
+<div id="outline-container-org4277dd3" class="outline-2">
+<h2 id="org4277dd3"><span class="section-number-2">1</span> Humble beginnings</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 We need to create a project for our app, but before that we need a name. Let's call it <i>janken</i> (じゃん拳), the Japanese name for the game. You can create your project using <code>cargo</code>:
@@ -305,8 +100,8 @@ We need to be able to decide who the winner is so let's create a function that t
 </p>
 </div>
 
-<div id="outline-container-org763e18f" class="outline-3">
-<h3 id="org763e18f"><span class="section-number-3">1.1</span> Writing tests</h3>
+<div id="outline-container-org3ac2038" class="outline-3">
+<h3 id="org3ac2038"><span class="section-number-3">1.1</span> Writing tests</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 In Rust we usually write tests in a private module in the same file (<b>module</b>) as the implementation.
@@ -341,8 +136,8 @@ In Rust we usually write tests in a private module in the same file (<b>module</
 </div>
 </div>
 
-<div id="outline-container-orgca9ea91" class="outline-3">
-<h3 id="orgca9ea91"><span class="section-number-3">1.2</span> Partial implementations</h3>
+<div id="outline-container-org38417cb" class="outline-3">
+<h3 id="org38417cb"><span class="section-number-3">1.2</span> Partial implementations</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Now when you try to run the tests the code will not compile since the <code>is_winner</code> function has not yet been defined. Often you will want to try things out before you've figured out all the details of your implementation and made the code compile. Rust has a neat feature for this: the <code>todo!()</code> macro. The <code>todo!()</code> macro will allow your code to compile without you having finished the implementation.
@@ -370,8 +165,8 @@ Now we are able to run the test, but it fails with the message <i>not yet implem
 </div>
 </div>
 
-<div id="outline-container-org19c8d7e" class="outline-2">
-<h2 id="org19c8d7e"><span class="section-number-2">2</span> Rustifying the code</h2>
+<div id="outline-container-orgf45718d" class="outline-2">
+<h2 id="orgf45718d"><span class="section-number-2">2</span> Rustifying the code</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 There are multiple issues with our <code>is_winner</code> function, for one it does not handle draws yet (we will address that later).
@@ -382,8 +177,8 @@ Another issue is that the current implementation does not properly codify the do
 </p>
 </div>
 
-<div id="outline-container-org71553fe" class="outline-3">
-<h3 id="org71553fe"><span class="section-number-3">2.1</span> Our first enum</h3>
+<div id="outline-container-orga802670" class="outline-3">
+<h3 id="orga802670"><span class="section-number-3">2.1</span> Our first enum</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <b>EXERCISE 4</b>: Implement an <code>enum</code> called <code>HandShape</code> for all the hand shapes.
@@ -395,8 +190,8 @@ When you try to replace the strings with your new, fancy <code>HandShape</code> 
 </div>
 </div>
 
-<div id="outline-container-org005ee04" class="outline-3">
-<h3 id="org005ee04"><span class="section-number-3">2.2</span> Derivable traits and the derive macro</h3>
+<div id="outline-container-org7c06f8f" class="outline-3">
+<h3 id="org7c06f8f"><span class="section-number-3">2.2</span> Derivable traits and the derive macro</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Traits define a behavior contract that a type can adhere to, very similar to interfaces in other languages. Often you have to provide an implementation for the functions that a trait specifies, but some traits are <b>derivable</b>, that means that the Rust compiler can automatically generate the necessary code for us instead! Common derivable traits are <code>PartialEq</code> for equality comparisons and <code>Debug</code> for printing the type.
@@ -421,8 +216,8 @@ Traits define a behavior contract that a type can adhere to, very similar to int
 </div>
 </div>
 
-<div id="outline-container-org08a03ed" class="outline-3">
-<h3 id="org08a03ed"><span class="section-number-3">2.3</span> Pattern matching</h3>
+<div id="outline-container-org8a6c432" class="outline-3">
+<h3 id="org8a6c432"><span class="section-number-3">2.3</span> Pattern matching</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 One of the most useful features of Rust is its pattern matching capabilities, it's like a <code>switch</code> on steroids which not only helps you avoid complicated <code>if</code> chains, but also checks for exhaustiveness making sure you handle all of the possible scenarios.
@@ -449,8 +244,8 @@ All tests should be passing now, yay!
 </div>
 </div>
 
-<div id="outline-container-orge9e8976" class="outline-3">
-<h3 id="orge9e8976"><span class="section-number-3">2.4</span> What about draws?</h3>
+<div id="outline-container-org828a57d" class="outline-3">
+<h3 id="org828a57d"><span class="section-number-3">2.4</span> What about draws?</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Currently our <code>is_winner</code> function only returns a <code>bool</code>. There's no way for us to indicate a draw! Let's use an enum to encapsulate the three different possible round results.
@@ -466,8 +261,8 @@ Currently our <code>is_winner</code> function only returns a <code>bool</code>. 
 </div>
 </div>
 
-<div id="outline-container-org64f32f7" class="outline-3">
-<h3 id="org64f32f7"><span class="section-number-3">2.5</span> A little refactoring&#x2026;</h3>
+<div id="outline-container-org2d9dca2" class="outline-3">
+<h3 id="org2d9dca2"><span class="section-number-3">2.5</span> A little refactoring&#x2026;</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Now that we have our logic down we are ready to move on to focusing on interacting with the outside world. However, before we go there we need just a little bit of clean-up.
@@ -503,8 +298,8 @@ When you run the tests now you'll notice that not only did the warnings disappea
 </div>
 </div>
 
-<div id="outline-container-org1886f71" class="outline-3">
-<h3 id="org1886f71"><span class="section-number-3">2.6</span> Documentation</h3>
+<div id="outline-container-orgc38ac4c" class="outline-3">
+<h3 id="orgc38ac4c"><span class="section-number-3">2.6</span> Documentation</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 Another great feature of Rust is the focus on documentation: Cargo comes with built-in documentation capabilities. All comments starting with <code>///</code> are so-called doc strings and can be extracted into a standardized documentation website by running:
@@ -526,16 +321,16 @@ Doc strings are written in markdown and support adding code examples as in regul
 </div>
 </div>
 
-<div id="outline-container-org2f3dce3" class="outline-2">
-<h2 id="org2f3dce3"><span class="section-number-2">3</span> Interacting with the outside world</h2>
+<div id="outline-container-org933b004" class="outline-2">
+<h2 id="org933b004"><span class="section-number-2">3</span> Interacting with the outside world</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Let's shift our focus back to main.rs and turn our game logic into an actual game.
 </p>
 </div>
 
-<div id="outline-container-org0b9d564" class="outline-3">
-<h3 id="org0b9d564"><span class="section-number-3">3.1</span> Reading input from stdin</h3>
+<div id="outline-container-org173f961" class="outline-3">
+<h3 id="org173f961"><span class="section-number-3">3.1</span> Reading input from stdin</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Reading from stdin looks a little bit different than in Node.js or Python in that you first allocate a buffer string to populate:
@@ -571,8 +366,8 @@ If you have sharp eyes you might have noticed something else that stand out in t
 </div>
 </div>
 
-<div id="outline-container-orgef72686" class="outline-3">
-<h3 id="orgef72686"><span class="section-number-3">3.2</span> Error handling in Rust</h3>
+<div id="outline-container-org9e6bfde" class="outline-3">
+<h3 id="org9e6bfde"><span class="section-number-3">3.2</span> Error handling in Rust</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Let's remove the <code>unwrap()</code> call and run our application again!
@@ -667,8 +462,8 @@ There are more sophisticated ways to handle errors, but this is good enough for 
 </div>
 </div>
 
-<div id="outline-container-orgc72848f" class="outline-3">
-<h3 id="orgc72848f"><span class="section-number-3">3.3</span> Turning user input into HandShape</h3>
+<div id="outline-container-org485d4f2" class="outline-3">
+<h3 id="org485d4f2"><span class="section-number-3">3.3</span> Turning user input into HandShape</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 Before we can call our <code>execute_round</code> function we need to take the user input and convert it into a <code>HandShape</code>. Let's implement a function <code>to_handshape(s: String) -&gt; Result&lt;HandShape, String&gt;</code> (we'll use <code>String</code> as the error type) which can turn the user input into a <code>HandShape</code>.
@@ -679,9 +474,9 @@ Before we can call our <code>execute_round</code> function we need to take the u
 </p>
 </div>
 
-<div id="outline-container-orgf1aca06" class="outline-4">
-<h4 id="orgf1aca06">The TryFrom trait</h4>
-<div class="outline-text-4" id="text-orgf1aca06">
+<div id="outline-container-org6148f01" class="outline-4">
+<h4 id="org6148f01">The TryFrom trait</h4>
+<div class="outline-text-4" id="text-org6148f01">
 <p>
 While the above approach works in Rust we often rely on methods like <code>from()</code>, <code>into()</code>, <code>try_from()</code> and <code>try_into()</code> to convert between types. You can add these methods to your type by implementing the traits <code>From&lt;T&gt;</code> and <code>TryFrom&lt;T&gt;</code>. In our case we'll need the <code>TryFrom</code> trait since we cannot turn every possible user input into a <code>HandShape</code>.
 </p>
@@ -692,9 +487,9 @@ While the above approach works in Rust we often rely on methods like <code>from(
 </div>
 </div>
 
-<div id="outline-container-orgcd2aaa7" class="outline-4">
-<h4 id="orgcd2aaa7">String and &amp;str</h4>
-<div class="outline-text-4" id="text-orgcd2aaa7">
+<div id="outline-container-orga32ff48" class="outline-4">
+<h4 id="orga32ff48">String and &amp;str</h4>
+<div class="outline-text-4" id="text-orga32ff48">
 <p>
 One thing you quickly stumble upon in Rust is the fact that it has two types of strings: <code>String</code> and <code>&amp;str</code>. <code>String</code> is a mutable, heap allocated buffer. That is, you can modify it in place, grow it or shrink it. <code>str</code>, on the other hand, is called a <i>string slice</i> and is an immutable view of a contiguous sequence of UTF-8 bytes in memory. You almost always encounter <code>str</code> as a reference: <code>&amp;str</code>. <a href="https://blog.thoughtram.io/string-vs-str-in-rust/">This blog post</a> explains the difference in detail. We will briefly touch upon what a reference is when we go into ownership and borrowing.
 </p>
@@ -706,8 +501,8 @@ In short, in-line strings in your code will always be of type <code>&amp;str</co
 </div>
 </div>
 
-<div id="outline-container-org6a0ca5b" class="outline-3">
-<h3 id="org6a0ca5b"><span class="section-number-3">3.4</span> Our game loop</h3>
+<div id="outline-container-orgafc8876" class="outline-3">
+<h3 id="orgafc8876"><span class="section-number-3">3.4</span> Our game loop</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 Now we should have all the pieces we need to start implementing our actual game loop. There are many ways to loop in Rust:
@@ -732,9 +527,9 @@ At this point you most likely have had the compiler, at one time or another, kin
 </p>
 </div>
 
-<div id="outline-container-orgb501265" class="outline-4">
-<h4 id="orgb501265">Ownership and borrowing</h4>
-<div class="outline-text-4" id="text-orgb501265">
+<div id="outline-container-org880942b" class="outline-4">
+<h4 id="org880942b">Ownership and borrowing</h4>
+<div class="outline-text-4" id="text-org880942b">
 <p>
 Rust has an memory model based on ownership, it helps us with variable allocation and deallocation and makes sure we're not trying to access or use a variable that has been deallocated, a so called null pointer. What it means in practice is that a value can only have <b>a single owner</b> at any given time. When you reassign a value to another variable the value is <b>moved</b> to the new variable and ownership transferred. If the value type implements the <code>Copy</code> trait the value will be copied to the new variable without any transferal of ownership. On the <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html#implementors">Copy trait's documentation page</a> you can easily see what native types implement it. See the example below:
 </p>
@@ -833,8 +628,8 @@ There are more improvements we can do but we will leave it here for now. If you 
 </div>
 </div>
 
-<div id="outline-container-org899b083" class="outline-3">
-<h3 id="org899b083"><span class="section-number-3">3.5</span> Making it random</h3>
+<div id="outline-container-org754c01b" class="outline-3">
+<h3 id="org754c01b"><span class="section-number-3">3.5</span> Making it random</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 Currently our adversary is just responding with the same hand shape everytime, not much fun at all. We need a way to make it respond with different shapes each time. Oddly enough Rust does not provide an easy way of generating random numbers in its standard library, so we will have to some foraging to find a suitable package on <a href="https://crates.io">https://crates.io</a>, Rust's crate registry.
@@ -870,8 +665,8 @@ You did it! You have built a very simple, but functional, implementation of rock
 </div>
 </div>
 
-<div id="outline-container-orgac28625" class="outline-2">
-<h2 id="orgac28625"><span class="section-number-2">4</span> Where to go next</h2>
+<div id="outline-container-org8034a05" class="outline-2">
+<h2 id="org8034a05"><span class="section-number-2">4</span> Where to go next</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 If I managed to whet your appetite for more, here are a some great resources I found very useful when learning Rust:
