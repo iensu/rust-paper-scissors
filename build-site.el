@@ -24,6 +24,14 @@
       org-html-html5-fancy t
       org-html-doctype "html5"
       org-html-htmlize-output-type 'css
+      org-html-head-include-default-style nil
+      org-html-head-include-scripts nil
+      org-html-head (cl-loop for style in '("base.css" "htmlize.css" "style-overrides.css")
+                             collect (format "<link rel=\"stylesheet\" href=\"assets/%s\" />\n"
+                                             style)
+                             into styles
+                             finally return (string-trim (apply #'concat styles)))
+
 
       org-publish-project-alist
       `(("static"
