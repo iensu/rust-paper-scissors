@@ -1,16 +1,7 @@
 (setq project-path (file-name-directory (or (buffer-file-name) load-file-name))
       backup-directory-alist `(("." . ,(concat project-path ".backups")))
-      publish-project-path (concat project-path "docs/")
+      publish-project-path (concat project-path "dist/")
       package-user-dir (concat project-path ".packages"))
-
-(require 'package)
-(package-initialize)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-(package-refresh-contents)
-
-(package-install 'rust-mode :dont-select)
-(package-install 'htmlize :dont-select)
 
 (require 'org)
 (require 'sh-script)
@@ -32,14 +23,14 @@
                              into styles
                              finally return (string-trim (apply #'concat styles)))
 
-
+      org-publish-timestamp-directory "./.org-timestamps/"
       org-publish-project-alist
       `(("static"
          :base-directory ,project-path
          :base-extension "css\\|png\\|jpe?g\\|svg"
          :publishing-directory ,publish-project-path
          :publishing-function org-publish-attachment
-         :exclude "docs"
+         :exclude "dist"
          :recursive t)
 
         ("org"
@@ -47,7 +38,7 @@
          :publishing-directory ,publish-project-path
          :publishing-function org-html-publish-to-html
          :base-extension "org"
-         :exclude "docs"
+         :exclude "dist"
          :time-stamp-file nil)
 
         ("site" :components ("static" "org"))))
